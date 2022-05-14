@@ -1,0 +1,9 @@
+:root{
+    --background: rgb(17, 14, 51);
+    --color: rgb(255,255,255);
+    --font-family: "Calibri MS", "Calibri";
+}
+body{
+    background-color: var(--background);
+    color: var(--color);
+}
