@@ -1,113 +1,47 @@
 {%extends 'layout.html'%}
 {%block title%}Home{%endblock%}
 {%block scripts%}
-<script defer>
-    "use strict"
+<script defer src="static\js\audio_media_handler.js"></script>
+<script defer src="static\js\homepage.js"></script>
 
-const AudioContext = window.AudioContext || window.webkitAudioContext;
-var context = new AudioContext({'sampleRate':44100});
-
-function record_audio_segment(stream, audioElementId = 'audio', timeMS = 5000){
-   const mediaRecorder = new MediaRecorder(stream);
-   document.getElementById('get_audio_for_shazam').addEventListener('click', function(){
-      mediaRecorder.start();
-         setTimeout(()=>{mediaRecorder.stop()}, timeMS);
-         mediaRecorder.addEventListener('dataavailable', (e) =>{
-         var blob = new Blob([e.data], { 'type' : 'audio/raw; codecs=opus' });
-         document.getElementById(audioElementId).src = window.URL.createObjectURL(blob);
-         });
-   });
-   return
-}
-
-
-
-window.SpeechRecognition = window.SpeechRecognition
-                || window.webkitSpeechRecognition;
-const recognition = new SpeechRecognition();
-recognition.interimResults = true;
-recognition.continuous = true;
-
-recognition.addEventListener('result', e => {
-    const transcript = Array.from(e.results)
-        .map(result => result[0])
-        .map(result => result.transcript)
-        //.join('')
-    const confidence = Array.from(e.results)
-        .map(result => result[0])
-        .map(result => result.confidence)
-        //.join('')
-    const temp_transcript = String(transcript.pop()).trim();
-    const temp_confidence = String(confidence.pop()).trim();
-    if (transcript[0] != undefined){
-      document.getElementById('microphone_speaker_circle').className = "microphone-speaker-circle speaking-active";
-    }else{
-      document.getElementById('microphone_speaker_circle').className = "microphone-speaker-circle";
-    }
-
-});
-if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-   console.log('getUserMedia supported.');
-   navigator.mediaDevices.getUserMedia (
-      // constraints - only audio needed for this app
-      {
-         audio: true
-      })
-      // Success callback
-      .then(function(stream) {
-         //record_audio_segment(stream)
-
-      })
-
-      // Error callback
-      .catch(function(err) {
-         console.log('The following getUserMedia error occurred: ' + err);
-      }
-   );
-} else {
-   console.log('getUserMedia not supported on your browser!');
-}
-
-
- 
-
-    
-</script>
 {%endblock%}
 {%block style%}
 {%endblock%}
 {%block content%}
-Home Page
-<button id = "get_audio_for_shazam">Record</button>
-<button id = "temporary_stop">Stop</button>
-<audio controls id = "audio">
 
-  </audio>
-  <audio controls id = "second_audio"></audio>
-<style>
-   .microphone-speaker-circle{
-      height: 10vh;
-      width: 10vh;
-      border-radius: 10vh;
-      position: absolute;
-      border: 0.25rem dashed black;
-      text-align: center;
-      font-size: 5vh;
-   }
-   .speaking-active{
-      border: 0.25rem solid black;
-   }
-   .speaking-active>i{
-      transform: scale(1.3);
-      transition-duration: 100ms;
-   }
-   .microphone-speaker-circle>i{
-      transition-duration: 100ms;
-   }
-</style>
-<div class = "microphone-speaker-circle" onmouseover="this.className = 'microphone-speaker-circle speaking-active'";
+<!--<div class = "microphone-speaker-circle" onmouseover="this.className = 'microphone-speaker-circle speaking-active'";
 onmouseout="this.className = 'microphone-speaker-circle'" id = "microphone_speaker_circle">
    <i class="fa-solid fa-microphone"></i>
+</div>-->
+
+<div class = "query-form" style="display: block;">
+   <input type = "text" id = "query" class="form input">
+   <label for="query">Query</label>
 </div>
-<input>
+<style>
+   .search-result-item{
+      border: 2px solid white;
+   }
+   .album-art{
+      height: 50px;
+      width: 50px;
+   }
+</style>
+<script>
+   
+</script>
+<div id = "search_results">
+   <div id="track-62PaSfnXSMyLshYJrlTuL3" class="search-result-item">
+      <div class = "album-art-container">
+        <img src="https://i.scdn.co/image/ab67616d00001e022e88d7f65e6bea2a05202c14" alt="25 Cover Art" class="album-art">
+      </div>
+      <div class = "track-information-container">
+        <div>Hello</div>
+        <div>25</div><div>Adele</div><button data-audio-id="62PaSfnXSMyLshYJrlTuL3">Show Preview</button>
+      </div>
+      <div>Hello</div>
+      <!--<audio controls  src="https://p.scdn.co/mp3-preview/c9e07a3179cae95f703580aa53325ec73781ddff?cid=f6a40776580943a7bc5173125a1e8832"></audio>-->
+      </div>
+</div>
+<button id = "primary_search_button" class = "btn btn-primary">Search</button>
 {%endblock%}

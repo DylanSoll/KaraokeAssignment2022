@@ -7,3 +7,23 @@ body{
     background-color: var(--background);
     color: var(--color);
 }
+
+.microphone-speaker-circle{
+    height: 10vh;
+    width: 10vh;
+    border-radius: 10vh;
+    position: absolute;
+    border: 0.25rem dashed black;
+    text-align: center;
+    font-size: 5vh;
+ }
+ .speaking-active{
+    border: 0.25rem solid black;
+ }
+ .speaking-active>i{
+    transform: scale(1.3);
+    transition-duration: 100ms;
+ }
+ .microphone-speaker-circle>i{
+    transition-duration: 100ms;
+ }
