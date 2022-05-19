@@ -1,5 +1,7 @@
 import http.client
 from json import loads
+import requests
+
 class spotifyMusicHandler:
     def __init__(self, API_key): 
         """Create handler for spotify api
@@ -9,18 +11,21 @@ class spotifyMusicHandler:
         """        
         self.current_track = {'track_id':'25FTMokYEbEWHEdss5JLZS'}
         self.get_from_search_options = ['albums', 'artists', 'episodes', 'genres', 'playlists', 'podcasts', 'tracks', 'users', 'multi']
-        self.connection = http.client.HTTPSConnection("spotify23.p.rapidapi.com")
+        self.url = "https://spotify23.p.rapidapi.com/search/"
         self.headers = {
-            'X-RapidAPI-Host': "spotify23.p.rapidapi.com",
-            'X-RapidAPI-Key': API_key
-            }
+            "X-RapidAPI-Host": "spotify23.p.rapidapi.com",
+            "X-RapidAPI-Key": API_key
+        }
         
         return
-    def get_current_track(self):
+    def get_current_track(self, track = None):
         if self.current_track == None:
             return False
+        if track == None:
+            track = self.current_track
         else:
-            self.connection.request("GET", f"/tracks/?ids={self.current_track['track_id']}", headers=self.headers)
+            querystring = {"ids":self.track}
+            requests.request("GET", self.url, headers=self.headers, params=querystring)
             response = self.connection.getresponse()
             data = response.read()
             
@@ -44,9 +49,12 @@ class spotifyMusicHandler:
         if query_type not in self.get_from_search_options:
             query_type = 'multi' 
         #checks to see if any non-digits are in limit
-        
-        self.connection.request("GET", f"/search/?q={final_query}&type={query_type}&offset={offset}&limit={limit}&numberOfTopResults={num_top_results}", headers=self.headers)  
-        response = self.connection.getresponse()
-        data = response.read()
-        
+        querystring = {"q":final_query,"type":query_type,"offset":offset,"limit":limit,"numberOfTopResults":num_top_results}
+
+        response = requests.request("GET", self.url, headers=self.headers, params=querystring)
+        data = response.text
+                
         return loads(data.decode("utf-8"))
+
+if __name__ == '__main__':
+    SPOTIFY = spotifyMusicHandler('badc7baeeamsh7de16dfafae2bf6p1b8019jsn3188359ba6cf')
