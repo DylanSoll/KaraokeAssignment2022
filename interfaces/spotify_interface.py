@@ -1,7 +1,6 @@
-import http.client
 from json import loads
 import requests
-
+from time import time
 class spotifyMusicHandler:
     def __init__(self, API_key): 
         """Create handler for spotify api
@@ -11,27 +10,42 @@ class spotifyMusicHandler:
         """        
         self.current_track = {'track_id':'25FTMokYEbEWHEdss5JLZS'}
         self.get_from_search_options = ['albums', 'artists', 'episodes', 'genres', 'playlists', 'podcasts', 'tracks', 'users', 'multi']
-        self.url = "https://spotify23.p.rapidapi.com/search/"
+        self.url = "https://spotify23.p.rapidapi.com"
         self.headers = {
             "X-RapidAPI-Host": "spotify23.p.rapidapi.com",
             "X-RapidAPI-Key": API_key
         }
-        
         return
-    def get_current_track(self, track = None):
-        if self.current_track == None:
+
+    def getInfo(self, url, HTTPmethod, parameters):
+        """A general function to connect to the spotify API
+
+        Args:
+            url (str): ending url of the spotify api target
+            HTTPmethod (str): HTTP method to send to server 'GET' OR 'POST ETC.
+            parameters (dict): Parameters to pass along to API
+
+        Returns:
+            dict: {results, duration}
+        """            
+        init_time = time()
+        response = requests.request(HTTPmethod, self.url + url, headers=self.headers, params=parameters)
+        duration = time() - init_time         
+        return {'results':loads(response.text), 'duration': duration}
+
+    def getTracks(self, tracksID):
+        if not isinstance(tracksID, 'str'):
             return False
-        if track == None:
-            track = self.current_track
-        else:
-            querystring = {"ids":self.track}
-            requests.request("GET", self.url, headers=self.headers, params=querystring)
-            response = self.connection.getresponse()
-            data = response.read()
-            
-            print(data.decode("utf-8"))
-            return loads(data.decode("utf-8"))
-    
+        querystring = {"ids":self.track}
+        return self.getInfo('/tracks', 'GET', querystring)
+
+    def getTracksCredits(self, tracksID):
+        if not isinstance(tracksID, 'str'):
+            return False
+        tracksID = tracksID.replace(' ', '') #removes all white spaces
+        querystring = {"ids":self.track}
+        return self.getInfo('/track_credits', 'GET', querystring)
+
     def get_from_search(self, query, query_type = "multi",offset = 0, limit = 20, num_top_results = 5):
         """get details from string query
 
@@ -50,11 +64,9 @@ class spotifyMusicHandler:
             query_type = 'multi' 
         #checks to see if any non-digits are in limit
         querystring = {"q":final_query,"type":query_type,"offset":offset,"limit":limit,"numberOfTopResults":num_top_results}
-
-        response = requests.request("GET", self.url, headers=self.headers, params=querystring)
-        data = response.text
-                
-        return loads(data.decode("utf-8"))
+        return self.getInfo('/search', 'GET', querystring)
 
 if __name__ == '__main__':
     SPOTIFY = spotifyMusicHandler('badc7baeeamsh7de16dfafae2bf6p1b8019jsn3188359ba6cf')
+    results = SPOTIFY.get_from_search('kokomo', 'tracks')
+    print(results['tracks'])

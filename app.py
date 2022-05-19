@@ -21,6 +21,7 @@ def search_results():
         return redirect('/')
     query = request.form.get('query')
     results = SPOTIFY.get_from_search(query, 'tracks')
+    print(results)
     return jsonify(results)
 
 
@@ -30,7 +31,7 @@ def get_song():
         return redirect('/')
     track_id = request.form.get('track_id')
     SPOTIFY.current_track['track_id'] = track_id
-    results = SPOTIFY.get_current_track()
+    results = SPOTIFY.getTracks(track_id)
     print(results)
     return jsonify(results)
 if __name__ == '__main__':
